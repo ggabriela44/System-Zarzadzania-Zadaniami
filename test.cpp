@@ -3,162 +3,164 @@
 #include <string>
 #include <algorithm>
 
-// Klasa zadania
-class Task {
-public:
-    Task(int id, const std::string& description)
-        : id(id), description(description) {}
+using namespace std;
 
-    int getId() const { return id; }
-    std::string getDescription() const { return description; }
-    void setDescription(const std::string& desc) { description = desc; }
+// Klasa zadania
+class Zadanie {
+public:
+    Zadanie(int id, const string& opis)
+        : id(id), opis(opis) {}
+
+    int pobierzId() const { return id; }
+    string pobierzOpis() const { return opis; }
+    void ustawOpis(const string& nowyOpis) { opis = nowyOpis; }
 
 private:
     int id;
-    std::string description;
+    string opis;
 };
 
 // Interfejs obserwatora
-class Observer {
+class Obserwator {
 public:
-    virtual void update() = 0;
+    virtual void aktualizuj() = 0;
 };
 
 // Klasa zarządzająca zadaniami (Singleton)
-class TaskManager {
+class MenedzerZadan {
 public:
-    static TaskManager& getInstance() {
-        static TaskManager instance;
-        return instance;
+    static MenedzerZadan& pobierzInstancje() {
+        static MenedzerZadan instancja;
+        return instancja;
     }
 
-    void addTask(const Task& task) {
-        tasks.push_back(task);
-        notifyObservers();
+    void dodajZadanie(const Zadanie& zadanie) {
+        zadania.push_back(zadanie);
+        powiadomObserwatorow();
     }
 
-    void editTask(int id, const std::string& newDescription) {
-        auto it = std::find_if(tasks.begin(), tasks.end(), [id](const Task& task) {
-            return task.getId() == id;
+    void edytujZadanie(int id, const string& nowyOpis) {
+        auto it = find_if(zadania.begin(), zadania.end(), [id](const Zadanie& zadanie) {
+            return zadanie.pobierzId() == id;
             });
-        if (it != tasks.end()) {
-            it->setDescription(newDescription);
-            notifyObservers();
+        if (it != zadania.end()) {
+            it->ustawOpis(nowyOpis);
+            powiadomObserwatorow();
         }
         else {
-            std::cout << "Task not found.\n";
+            cout << "Zadanie nie znalezione.\n";
         }
     }
 
-    void removeTask(int id) {
-        tasks.erase(std::remove_if(tasks.begin(), tasks.end(), [id](const Task& task) {
-            return task.getId() == id;
-            }), tasks.end());
-        notifyObservers();
+    void usunZadanie(int id) {
+        zadania.erase(remove_if(zadania.begin(), zadania.end(), [id](const Zadanie& zadanie) {
+            return zadanie.pobierzId() == id;
+            }), zadania.end());
+        powiadomObserwatorow();
     }
 
-    const std::vector<Task>& getTasks() const {
-        return tasks;
+    const vector<Zadanie>& pobierzZadania() const {
+        return zadania;
     }
 
-    void addObserver(Observer* observer) {
-        observers.push_back(observer);
+    void dodajObserwatora(Obserwator* obserwator) {
+        obserwatorzy.push_back(obserwator);
     }
 
-    void notifyObservers() { // Przeniesiono do sekcji publicznej
-        for (Observer* observer : observers) {
-            observer->update();
+    void powiadomObserwatorow() {
+        for (Obserwator* obserwator : obserwatorzy) {
+            obserwator->aktualizuj();
         }
     }
 
 private:
-    TaskManager() {}
-    TaskManager(const TaskManager&) = delete;
-    TaskManager& operator=(const TaskManager&) = delete;
+    MenedzerZadan() {}
+    MenedzerZadan(const MenedzerZadan&) = delete;
+    MenedzerZadan& operator=(const MenedzerZadan&) = delete;
 
-    std::vector<Task> tasks;
-    std::vector<Observer*> observers;
+    vector<Zadanie> zadania;
+    vector<Obserwator*> obserwatorzy;
 };
 
 // Klasa obserwatora wypisująca listę zadań
-class TaskListPrinter : public Observer {
+class WypisywaczListyZadan : public Obserwator {
 public:
-    void update() override {
-        const std::vector<Task>& tasks = TaskManager::getInstance().getTasks();
-        std::cout << "Current tasks:\n";
-        for (const Task& task : tasks) {
-            std::cout << "ID: " << task.getId() << ", Description: " << task.getDescription() << '\n';
+    void aktualizuj() override {
+        const vector<Zadanie>& zadania = MenedzerZadan::pobierzInstancje().pobierzZadania();
+        cout << "Aktualne zadania:\n";
+        for (const Zadanie& zadanie : zadania) {
+            cout << "ID: " << zadanie.pobierzId() << ", Opis: " << zadanie.pobierzOpis() << '\n';
         }
-        std::cout << '\n';
+        cout << '\n';
     }
 };
 
 // Funkcje pomocnicze do interfejsu użytkownika
-void printMenu() {
-    std::cout << "1. Add Task\n";
-    std::cout << "2. Edit Task\n";
-    std::cout << "3. Remove Task\n";
-    std::cout << "4. Print Tasks\n";
-    std::cout << "5. Exit\n";
+void wypiszMenu() {
+    cout << "1. Dodaj Zadanie\n";
+    cout << "2. Edytuj Zadanie\n";
+    cout << "3. Usun Zadanie\n";
+    cout << "4. Wypisz Zadania\n";
+    cout << "5. Wyjdz\n";
 }
 
-void addTask() {
+void dodajZadanie() {
     int id;
-    std::string description;
-    std::cout << "Enter task ID: ";
-    std::cin >> id;
-    std::cin.ignore();
-    std::cout << "Enter task description: ";
-    std::getline(std::cin, description);
+    string opis;
+    cout << "Podaj ID zadania: ";
+    cin >> id;
+    cin.ignore();
+    cout << "Podaj opis zadania: ";
+    getline(cin, opis);
 
-    TaskManager::getInstance().addTask(Task(id, description));
+    MenedzerZadan::pobierzInstancje().dodajZadanie(Zadanie(id, opis));
 }
 
-void editTask() {
+void edytujZadanie() {
     int id;
-    std::string description;
-    std::cout << "Enter task ID to edit: ";
-    std::cin >> id;
-    std::cin.ignore();
-    std::cout << "Enter new task description: ";
-    std::getline(std::cin, description);
+    string opis;
+    cout << "Podaj ID zadania do edycji: ";
+    cin >> id;
+    cin.ignore();
+    cout << "Podaj nowy opis zadania: ";
+    getline(cin, opis);
 
-    TaskManager::getInstance().editTask(id, description);
+    MenedzerZadan::pobierzInstancje().edytujZadanie(id, opis);
 }
 
-void removeTask() {
+void usunZadanie() {
     int id;
-    std::cout << "Enter task ID to remove: ";
-    std::cin >> id;
+    cout << "Podaj ID zadania do usunięcia: ";
+    cin >> id;
 
-    TaskManager::getInstance().removeTask(id);
+    MenedzerZadan::pobierzInstancje().usunZadanie(id);
 }
 
 int main() {
-    TaskListPrinter printer;
-    TaskManager::getInstance().addObserver(&printer);
+    WypisywaczListyZadan wypisywacz;
+    MenedzerZadan::pobierzInstancje().dodajObserwatora(&wypisywacz);
 
     while (true) {
-        printMenu();
-        int choice;
-        std::cin >> choice;
-        switch (choice) {
+        wypiszMenu();
+        int wybor;
+        cin >> wybor;
+        switch (wybor) {
         case 1:
-            addTask();
+            dodajZadanie();
             break;
         case 2:
-            editTask();
+            edytujZadanie();
             break;
         case 3:
-            removeTask();
+            usunZadanie();
             break;
         case 4:
-            TaskManager::getInstance().notifyObservers(); // Upewnij się, że notifyObservers jest publiczne
+            MenedzerZadan::pobierzInstancje().powiadomObserwatorow();
             break;
         case 5:
             return 0;
         default:
-            std::cout << "Invalid choice.\n";
+            cout << "Nieprawidłowy wybór.\n";
         }
     }
 }
