@@ -87,7 +87,7 @@ class WypisywaczListyZadan : public Obserwator {
 public:
     void aktualizuj() override {
         const vector<Zadanie>& zadania = MenedzerZadan::pobierzInstancje().pobierzZadania();
-        cout << "\n-------\nAktualne zadania:\n";
+        cout << "Aktualne zadania:\n";
         for (const Zadanie& zadanie : zadania) {
             cout << "ID: " << zadanie.pobierzId() << ", Opis: " << zadanie.pobierzOpis() << '\n';
         }
@@ -97,7 +97,6 @@ public:
 
 // Funkcje pomocnicze do interfejsu użytkownika
 void wypiszMenu() {
-    cout << "Wybierz jedna z podanych opcji (1-5):\n";
     cout << "1. Dodaj Zadanie\n";
     cout << "2. Edytuj Zadanie\n";
     cout << "3. Usun Zadanie\n";
@@ -131,7 +130,7 @@ void edytujZadanie() {
 
 void usunZadanie() {
     int id;
-    cout << "Podaj ID zadania do usuniecia: ";
+    cout << "Podaj ID zadania do usunięcia: ";
     cin >> id;
 
     MenedzerZadan::pobierzInstancje().usunZadanie(id);
@@ -140,8 +139,7 @@ void usunZadanie() {
 int main() {
     WypisywaczListyZadan wypisywacz;
     MenedzerZadan::pobierzInstancje().dodajObserwatora(&wypisywacz);
-    cout << "TOo-Da-lOo" << endl;
-    cout << "Witaj w Systemie Zarzadania Zadaniami! - Skonfiguruj swoja wlasna liste zadan." << endl;
+
     while (true) {
         wypiszMenu();
         int wybor;
@@ -162,7 +160,7 @@ int main() {
         case 5:
             return 0;
         default:
-            cout << "Nieprawidlowy wybor.\n";
+            cout << "Nieprawidłowy wybór.\n";
         }
     }
 }
