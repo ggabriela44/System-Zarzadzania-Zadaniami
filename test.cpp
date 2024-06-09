@@ -97,7 +97,7 @@ public:
 
 // Funkcje pomocnicze do interfejsu użytkownika
 void wypiszMenu() {
-    cout << "Wybierz jedna z podanych opcji (1-5):\n\n";
+    cout << "\nWybierz jedna z podanych opcji (1-5):\n\n";
     cout << "1. Dodaj Zadanie\n";
     cout << "2. Edytuj Zadanie\n";
     cout << "3. Usun Zadanie\n";
@@ -141,7 +141,7 @@ int main() {
     WypisywaczListyZadan wypisywacz;
     MenedzerZadan::pobierzInstancje().dodajObserwatora(&wypisywacz);
     cout << "TOo-Da-lOo\n" << endl;
-    cout << "Witaj w Systemie Zarzadania Zadaniami! - Skonfiguruj swoja wlasna liste zadan.\n" << endl;
+    cout << "Witaj w Systemie Zarzadania Zadaniami! - Skonfiguruj swoja wlasna liste zadan." << endl;
     while (true) {
         wypiszMenu();
         int wybor;
