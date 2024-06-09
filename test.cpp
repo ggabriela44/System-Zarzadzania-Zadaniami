@@ -65,16 +65,16 @@ public:
         observers.push_back(observer);
     }
 
-private:
-    TaskManager() {}
-    TaskManager(const TaskManager&) = delete;
-    TaskManager& operator=(const TaskManager&) = delete;
-
-    void notifyObservers() {
+    void notifyObservers() { // Przeniesiono do sekcji publicznej
         for (Observer* observer : observers) {
             observer->update();
         }
     }
+
+private:
+    TaskManager() {}
+    TaskManager(const TaskManager&) = delete;
+    TaskManager& operator=(const TaskManager&) = delete;
 
     std::vector<Task> tasks;
     std::vector<Observer*> observers;
@@ -153,7 +153,7 @@ int main() {
             removeTask();
             break;
         case 4:
-            TaskManager::getInstance().notifyObservers();
+            TaskManager::getInstance().notifyObservers(); // Upewnij się, że notifyObservers jest publiczne
             break;
         case 5:
             return 0;
